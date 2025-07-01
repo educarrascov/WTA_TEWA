@@ -4,7 +4,7 @@
 
 **Autor: Eduardo Carrasco Vidal**, Oficial de Marina, Dirección de Programas, Investigación y Desarrollo de la Armada.
 
-** Acceso al código en [LINK](https://github.com/educarrascov/WTA_TEWA/blob/main/20260630_WTA_MINLP.ipynb)
+Acceso al código en [LINK](https://github.com/educarrascov/WTA_TEWA/blob/main/20260630_WTA_MINLP.ipynb)
 
 ## A. Weapon–Target Assignment via Piecewise Linearization and CPLEX
 
