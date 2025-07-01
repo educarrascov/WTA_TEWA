@@ -4,6 +4,8 @@
 
 **Autor: Eduardo Carrasco Vidal**, Oficial de Marina, Dirección de Programas, Investigación y Desarrollo de la Armada.
 
+** Acceso al código en [LINK](https://github.com/educarrascov/WTA_TEWA/blob/main/20260630_WTA_MINLP.ipynb)
+
 ## A. Weapon–Target Assignment via Piecewise Linearization and CPLEX
 
 Este notebook muestra paso a paso cómo resolver el modelo WTA (Ecuación canónica de Maine (1958)), mediante una linearización utilizando PWL objeto pueda ser resuelto en solvers standard como CPLEX que no permiten funciones no lineales.
