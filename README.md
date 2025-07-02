@@ -4,81 +4,9 @@
 
 **Autor: Eduardo Carrasco Vidal**, Oficial de Marina, Dirección de Programas, Investigación y Desarrollo de la Armada.
 
-Acceso al código en [LINK](https://github.com/educarrascov/WTA_TEWA/blob/main/20260630_WTA_MINLP.ipynb)
+Acceso al código y extensión del planteamiento matemático en [LINK](https://github.com/educarrascov/WTA_TEWA/blob/main/20260630_WTA_MINLP.ipynb)
 
 ## A. Weapon–Target Assignment via Piecewise Linearization and CPLEX
-
-Este notebook muestra paso a paso cómo resolver el modelo WTA (Ecuación canónica de Maine (1958)), mediante una linearización utilizando PWL objeto pueda ser resuelto en solvers standard como CPLEX que no permiten funciones no lineales.
-
-### 1. Modelo canónico
-
-**Variables de decisión**  
-
-- $x_{ij}\in\mathbb{Z}_+$: número de armas de tipo $i$ asignadas al blanco $j$.
-
-**Parámetros**  
-
-- $w_i$: inventario disponible de armas tipo $i$.  
-- $V_j$: valor de destrucción del blanco $j$.  
-- $p_{ij}$: probabilidad de impacto de un arma tipo $i$ sobre el blanco $j$.  
-- Definimos $q_{ij} = 1 - p_{ij}$.
-
-**Función objetivo**  
-> Minimizar la suma de supervivencias ponderadas:  
->
-> $$
-> \min_{x\in\mathbb{Z}_+}\;F(x)
-> \;=\;
-> \sum_{j=1}^n V_j \,\prod_{i=1}^m (1 - p_{ij})^{\,x_{ij}}
-> \;=\;
-> \sum_{j=1}^n V_j \exp\!\Bigl(\sum_{i=1}^m x_{ij}\ln q_{ij}\Bigr).
-> $$
-
-**Restricciones**  
-> Inventario de armas:
-> $$
-> \sum_{j=1}^n x_{ij} \;\le\; w_i
-> \quad
-> \forall\,i=1,\dots,m
-> $$
->
-> Dominio entero:
-> $$
-> x_{ij}\in\mathbb{Z}_+,
-> \quad
-> \forall\,i=1,\dots,m,\;j=1,\dots,n.
-> $$
-
----
-
-### 2. Linealización _Piecewise Linear_ (PWL)
-
-Para cada blanco $j$, definimos la variable auxiliar  $ y_j = \sum_{i=1}^m x_{ij}\,\ln q_{ij} $ y aproximamos  $ f_j = V_j\,e^{y_j} $
-mediante segmentos lineales:
-
-1. **Bounds de** $y_j$  
-   $$
-     \underline y_j = \sum_{i=1}^m w_i\,\ln(q_{ij}),
-     \quad
-     \overline y_j = 0.
-   $$
-
-2. **Puntos de ruptura**  
-   Para $ k=0,1,\dots,K $:
-   $$
-     \xi_{j,k}
-     = \underline y_j + \frac{k}{K}\bigl(\overline y_j - \underline y_j\bigr),
-     \quad
-     f_{j,k} = V_j\,e^{\,\xi_{j,k}}.
-   $$
-
-3. **Variables PWL**  
-   $ \lambda_{j,k}\ge0 $, con
-   $$
-     \sum_{k=0}^K \lambda_{j,k} = 1,\quad
-     y_j = \sum_{k=0}^K \xi_{j,k}\,\lambda_{j,k},\quad
-     f_j = \sum_{k=0}^K f_{j,k}\,\lambda_{j,k}.
-   $$
 
 ---
 
@@ -213,68 +141,7 @@ if __name__ == "__main__":
 
 ## B. Heurística Greedy para el Problema de Asignación Arma–Blanco (WTA)
 
-### 1. Objectivo
-
-Buscamos resolver la formulación canónica del WTA:
-
-$$
-\min \sum_{j=1}^{n} V_j \prod_{i=1}^{m} \left(1 - p_{ij} \right)^{x_{ij}}
-$$
-
-Donde:
-
-- $ V_j $: Valor de destrucción del blanco $ j $
-- $ p_{ij} $: Probabilidad de que el arma $ i $ destruya el blanco $ j $
-- $ x_{ij} \in \mathbb{Z}_+ $: Número de armas $ i $ asignadas al blanco $ j $
-
-Esto puede reescribirse utilizando las probabilidades de supervivencia $ q_{ij} = 1 - p_{ij} $:
-
-$$
-\min \sum_{j=1}^{n} V_j \prod_{i=1}^{m} q_{ij}^{x_{ij}} = \sum_{j=1}^{n} V_j \cdot \exp\left( \sum_{i=1}^{m} x_{ij} \log q_{ij} \right)
-$$
-
-Dado:
-
-$$
-y_j = \sum_{i=1}^{m} x_{ij} \log q_{ij}, \quad f_j = V_j \cdot e^{y_j}
-$$
-
-Entonces, el objetivo se transforma en:
-
-$$
-\min \sum_{j=1}^{n} f_j
-$$
-
 ---
-
-### 2. Estrategia del Algoritmo Greedy
-
-Utilizamos una heurística greedy simple para aproximar la solución óptima:
-
-1. **Inicializacion**:
-   - Fijar todos los $ x_{ij} = 0 $
-   - Inicializar el inventario $ w_i $ para cada tipo de arma
-
-2. **Asignar armas iterativamente**:
-   - Para cada asignación factible $ (i,j) $, calcular el **incremento marginal en la supervivencia**:
-     $
-     \Delta f_j = f_j^{\text{new}} - f_j^{\text{current}}
-     $
-   - Elegir la asignación con el **mínimo** $ \Delta f_j $
-   - Actualizar $ x_{ij} $ y disminuir el inventario del arma $ i $
-
-3. **Detener cuando no queden armas** o no haya mejoras posibles.
-
----
-
-### 3. Output
-
-La salida incluye:
-
-- Objetivo total (suma de valores esperados de supervivencia)
-- Matriz de asignación $ x_{ij} $
-- Probabilidades $ p_{ij} $ utilizadas
-- Valores de los blancos $ V_j $
 
 ```python
 import math
